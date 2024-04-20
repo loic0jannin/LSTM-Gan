@@ -12,6 +12,4 @@
 #SBATCH --time=72:00:00
 #SBATCH --mail-type=END,FAIL
 
-module load pytorch/1.6.0-py37-cuda10.1
-
 srun python -m torch.distributed.launch --nproc_per_node=10 gan.py
