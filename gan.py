@@ -133,11 +133,11 @@ for epoch in tqdm(range(500)):
 
         
         # Preparing the real data to train the discriminator:
-        real_data = real_data.to(device)
-        real_data_label = real_data_label.to(device)
-        noise_data_set = noise_data_set.to(device)
-        fake_data_set = fake_data_set.to(device)
-        fake_data_label = fake_data_label.to(device)
+        real_data = real_data
+        real_data_label = real_data_label
+        noise_data_set = noise_data_set
+        fake_data_set = fake_data_set
+        fake_data_label = fake_data_label
 
         # Creating the training samples set:
         training_data_set = torch.cat((real_data, fake_data_set)).float()
