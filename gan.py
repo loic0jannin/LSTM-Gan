@@ -78,27 +78,20 @@ class Generator(nn.Module):
 class Discriminator(nn.Module):
     def __init__(self, input_size, hidden_size, num_layers, dropout_rate=0.2):
         super(Discriminator, self).__init__()
-        
-        # Create an instance of LSTMModel
         self.lstm = LSTMModel(input_size, hidden_size, num_layers, dropout_rate)
-        # Convolutional layer from 1 channel to 64
         self.conv1 = nn.Conv1d(1, 3, 1)
-        # Convolutional layer from 64 channels back to 1
         self.conv2 = nn.Conv1d(3, 1, 1)
-        # funlly connected layer that match the output of the conv 2 
         self.fc = nn.Linear(100, 1)
-        # sigmoid layer
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-        # Pass the input through the LSTMModel
+        # Add noise to the input
+        x = x + torch.randn_like(x) * 0.1
         output = self.lstm(x)
-        # Add an extra dimension for the number of channels
-        output = output.unsqueeze(1)  # Now the shape is (batch_size, 1, seq_len)
+        output = output.unsqueeze(1)
         first_conv = self.conv1(output)
         second_conv = self.conv2(first_conv)
         output = self.fc(second_conv)
-        # Remove the channel dimension
         output = output.squeeze(1)
         output = self.sigmoid(output)
         return output
@@ -131,7 +124,6 @@ print("Training the GAN...")
 for epoch in tqdm(range(500)):
     for index, (real_data,) in enumerate(train_loader):
 
-        
         # Preparing the real data to train the discriminator:
         real_data_label = torch.ones(batch_size,1)
 
@@ -155,16 +147,18 @@ for epoch in tqdm(range(500)):
         loss_discriminator.backward()
         optimizer_discriminator.step()
 
-        # Initialising the data for the generator: 
-        noise_data_set = torch.randn((batch_size, N))
+        # Train the generator more often
+        for _ in range(2):  # adjust this value to train generator more or less often
+            # Initialising the data for the generator: 
+            noise_data_set = torch.randn((batch_size, N))
 
-        # Train the generator:  
-        generator.zero_grad()
-        output_generator = generator(noise_data_set)
-        output_discriminator_generated = discriminator(output_generator)
-        loss_generator = criterion(output_discriminator_generated, real_data_label)
-        loss_generator.backward()
-        optimizer_generator.step()
+            # Train the generator:  
+            generator.zero_grad()
+            output_generator = generator(noise_data_set)
+            output_discriminator_generated = discriminator(output_generator)
+            loss_generator = criterion(output_discriminator_generated, real_data_label)
+            loss_generator.backward()
+            optimizer_generator.step()
 
     # Write the progress to the CSV file
     if epoch % 10 == 0:
@@ -172,7 +166,6 @@ for epoch in tqdm(range(500)):
             writer = csv.writer(file)
             writer.writerow([epoch, loss_discriminator.item(), loss_generator.item()])
             print(f"Epoch {epoch}, Discriminator Loss: {loss_discriminator.item()}, Generator Loss: {loss_generator.item()}",flush=True)
-
 
 
 def get_random_sample_from_generator(generator, N, batch_size,num_samples):
