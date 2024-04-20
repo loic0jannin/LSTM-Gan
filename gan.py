@@ -82,9 +82,9 @@ class Discriminator(nn.Module):
         # Create an instance of LSTMModel
         self.lstm = LSTMModel(input_size, hidden_size, num_layers, dropout_rate)
         # Convolutional layer from 1 channel to 64
-        self.conv1 = nn.Conv1d(1, 64, 1)
+        self.conv1 = nn.Conv1d(1, 3, 1)
         # Convolutional layer from 64 channels back to 1
-        self.conv2 = nn.Conv1d(64, 1, 1)
+        self.conv2 = nn.Conv1d(3, 1, 1)
         # funlly connected layer that match the output of the conv 2 
         self.fc = nn.Linear(100, 1)
         # sigmoid layer
@@ -105,8 +105,8 @@ class Discriminator(nn.Module):
 
 
 # Create the Generator and Discriminator
-generator = Generator(input_size=1, hidden_size=256, num_layers=1)
-discriminator = Discriminator(input_size=1, hidden_size=256, num_layers=1)
+generator = Generator(input_size=1, hidden_size=16, num_layers=1)
+discriminator = Discriminator(input_size=1, hidden_size=16, num_layers=1)
 
 # # Wrap the models with DistributedDataParallel
 # generator = DistributedDataParallel(generator)
