@@ -8,11 +8,11 @@ from torch.autograd.variable import Variable
 import torch.nn.functional as F
 torch.autograd.set_detect_anomaly(True)
 from torch.utils.data import DataLoader, TensorDataset
-import torch.distributed as dist
-from torch.nn.parallel import DistributedDataParallel
+# import torch.distributed as dist
+# from torch.nn.parallel import DistributedDataParallel
 
-# Initialize the distributed environment
-dist.init_process_group('nccl')
+# # Initialize the distributed environment
+# dist.init_process_group('nccl')
 
 # import the normalized slices
 slices = pd.read_csv('data/slices_normalized.csv', index_col=0)
@@ -108,9 +108,9 @@ class Discriminator(nn.Module):
 generator = Generator(input_size=1, hidden_size=256, num_layers=1)
 discriminator = Discriminator(input_size=1, hidden_size=256, num_layers=1)
 
-# Wrap the models with DistributedDataParallel
-generator = DistributedDataParallel(generator)
-discriminator = DistributedDataParallel(discriminator)
+# # Wrap the models with DistributedDataParallel
+# generator = DistributedDataParallel(generator)
+# discriminator = DistributedDataParallel(discriminator)
 
 
 # Define the loss function and optimizers
