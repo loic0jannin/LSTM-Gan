@@ -8,6 +8,11 @@ from torch.autograd.variable import Variable
 import torch.nn.functional as F
 torch.autograd.set_detect_anomaly(True)
 from torch.utils.data import DataLoader, TensorDataset
+import torch.distributed as dist
+from torch.nn.parallel import DistributedDataParallel
+
+# Initialize the distributed environment
+dist.init_process_group('nccl')
 
 # import the normalized slices
 slices = pd.read_csv('data/slices_normalized.csv', index_col=0)
@@ -100,14 +105,13 @@ class Discriminator(nn.Module):
 
 
 # Create the Generator and Discriminator
-generator = nn.DataParallel(Generator( input_size = 1, hidden_size = 256 , num_layers = 1))
-discriminator = nn.DataParallel(Discriminator( input_size = 1, hidden_size = 256 , num_layers = 1))
+generator = Generator(input_size=1, hidden_size=256, num_layers=1)
+discriminator = Discriminator(input_size=1, hidden_size=256, num_layers=1)
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+# Wrap the models with DistributedDataParallel
+generator = DistributedDataParallel(generator)
+discriminator = DistributedDataParallel(discriminator)
 
-# Move models to GPU
-generator.to(device)
-discriminator.to(device)
 
 # Define the loss function and optimizers
 criterion = nn.BCELoss()
