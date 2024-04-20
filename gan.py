@@ -100,8 +100,14 @@ class Discriminator(nn.Module):
 
 
 # Create the Generator and Discriminator
-generator = Generator( input_size = 1, hidden_size = 256 , num_layers = 1)
-discriminator = Discriminator( input_size = 1, hidden_size = 256 , num_layers = 1)
+generator = nn.DataParallel(Generator( input_size = 1, hidden_size = 256 , num_layers = 1))
+discriminator = nn.DataParallel(Discriminator( input_size = 1, hidden_size = 256 , num_layers = 1))
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+# Move models to GPU
+generator.to(device)
+discriminator.to(device)
 
 # Define the loss function and optimizers
 criterion = nn.BCELoss()
@@ -123,12 +129,11 @@ for epoch in tqdm(range(500)):
 
         
         # Preparing the real data to train the discriminator:
-        real_data_label = torch.ones(batch_size,1)
-
-        # Preparing the fake data to train the discriminator: 
-        noise_data_set = torch.randn((batch_size, N))
-        fake_data_set = generator(noise_data_set)
-        fake_data_label = torch.zeros(batch_size, 1)
+        real_data = real_data.to(device)
+        real_data_label = real_data_label.to(device)
+        noise_data_set = noise_data_set.to(device)
+        fake_data_set = fake_data_set.to(device)
+        fake_data_label = fake_data_label.to(device)
 
         # Creating the training samples set:
         training_data_set = torch.cat((real_data, fake_data_set)).float()
