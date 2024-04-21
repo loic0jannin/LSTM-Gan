@@ -143,23 +143,36 @@ print("Training the GAN...")
 for epoch in tqdm(range(500)):
     for index, (real_data,) in enumerate(train_loader):
 
-        # Train the discriminator
-        discriminator.zero_grad()
-        output_real = discriminator(real_data)
+        # Preparing the real data to train the discriminator:
+        real_data_label = torch.ones(batch_size,1)
+
+        # Preparing the fake data to train the discriminator: 
         noise_data_set = torch.randn((batch_size, N))
-        fake_data_set = generator(noise_data_set)
-        output_fake = discriminator(fake_data_set.detach())
-        loss_discriminator = -torch.mean(output_real) + torch.mean(output_fake)
+        fake_data_set = generator(noise_data_set).detach()
+        fake_data_label = torch.zeros(batch_size, 1)
+
+        # Creating the training samples set:
+        training_data_set = torch.cat((real_data, fake_data_set)).float()
+
+        # Creating the training labels set:
+        training_labels_set = torch.cat((real_data_label, fake_data_label))
+
+        # Train the discriminator:
+        discriminator.zero_grad()
+        output_discriminator = discriminator(training_data_set)
+        loss_discriminator = criterion(output_discriminator, training_labels_set)
         loss_discriminator.backward()
         optimizer_discriminator.step()
         schedulerD.step()
 
-        # Train the generator
-        generator.zero_grad()
+        # Initialising the data for the generator: 
         noise_data_set = torch.randn((batch_size, N))
-        fake_data_set = generator(noise_data_set)
-        output_fake = discriminator(fake_data_set)
-        loss_generator = -torch.mean(output_fake)
+
+        # Train the generator:  
+        generator.zero_grad()
+        output_generator = generator(noise_data_set)
+        output_discriminator_generated = discriminator(output_generator)
+        loss_generator = criterion(output_discriminator_generated, real_data_label)
         loss_generator.backward()
         optimizer_generator.step()
         schedulerG.step()
