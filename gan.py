@@ -27,7 +27,7 @@ slices_tensor = torch.tensor(slices.values)
 slices_dataset = TensorDataset(slices_tensor)
 
 # DEFINES THE BATCH SIZE
-batch_size = 32
+batch_size = 128
 
 # Create a DataLoader with shuffle=True for shuffling at each epoch
 train_loader = DataLoader(slices_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
@@ -187,7 +187,7 @@ for epoch in tqdm(range(500)):
         # generate a random time series
         noise = torch.randn((1, N))
         generated_sample = generator(noise)
-        generated_sample = generated_sample[0].detach().numpy()
+        generated_sample = generated_sample[0].detach()
 
         # prints the TS
         print(generated_sample)
