@@ -166,10 +166,19 @@ for epoch in tqdm(range(500)):
 
     # Write the progress to the CSV file
     if epoch % 1 == 0:
-        with open('losses.csv', 'a', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow([epoch, loss_discriminator.item(), loss_generator.item()])
-            print(f"Epoch {epoch}, Discriminator Loss: {loss_discriminator.item()}, Generator Loss: {loss_generator.item()}",flush=True)
+        # with open('losses.csv', 'a', newline='') as file:
+            # writer = csv.writer(file)
+             #writer.writerow([epoch, loss_discriminator.item(), loss_generator.item()])
+
+        # generate a random time series
+        noise = torch.randn((1, N))
+        generated_sample = generator(noise)
+        generated_sample = generated_sample[0].detach().numpy()
+
+        # prints the TS
+        print(generated_sample)
+
+        print(f"Epoch {epoch}, Discriminator Loss: {loss_discriminator.item()}, Generator Loss: {loss_generator.item()}",flush=True)
 
 
 def get_random_sample_from_generator(generator, N, batch_size,num_samples):
