@@ -108,9 +108,8 @@ discriminator = Discriminator(input_size=1, hidden_size=16, num_layers=1)
 
 # Define the loss function and optimizers
 criterion = nn.BCELoss()
-criterion_autoencoder = nn.MSELoss()  # Separate loss function for the autoencoder
-optimizer_discriminator = torch.optim.Adam(discriminator.parameters(), lr=0.0005)
-optimizer_generator = torch.optim.Adam(generator.parameters(), lr=0.0005)
+optimizer_discriminator = torch.optim.Adam(discriminator.parameters(), lr=0.001)
+optimizer_generator = torch.optim.Adam(generator.parameters(), lr=0.001)
 
 
 # Initialize the CSV file
