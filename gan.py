@@ -32,7 +32,7 @@ batch_size = 128
 # Create a DataLoader with shuffle=True for shuffling at each epoch
 train_loader = DataLoader(slices_dataset, batch_size=batch_size, shuffle=True, drop_last=True)
 
-N = 100
+N = 24
 
 # define the lstm model
 class LSTMModel(nn.Module):
@@ -41,7 +41,7 @@ class LSTMModel(nn.Module):
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True, dropout=dropout_rate)
-        self.fc = nn.Linear(hidden_size, 100)
+        self.fc = nn.Linear(hidden_size, 24)
 
     def forward(self, x):
         if x.dim() == 2:
@@ -89,7 +89,7 @@ class Discriminator(nn.Module):
         self.lstm = LSTMModel(input_size, hidden_size, num_layers, dropout_rate)
         self.conv1 = spectral_norm(nn.Conv1d(1, 3, 1))
         self.conv2 = spectral_norm(nn.Conv1d(3, 1, 1))
-        self.fc = spectral_norm(nn.Linear(100, 1))
+        self.fc = spectral_norm(nn.Linear(24, 1))
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
