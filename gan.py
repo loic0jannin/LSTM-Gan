@@ -61,9 +61,9 @@ class Generator(nn.Module):
         # Create an instance of LSTMModel
         self.lstm = LSTMModel(input_size, hidden_size, num_layers, dropout_rate)
         # Convolutional layer from 1 channel to 64
-        self.conv1 = nn.Conv1d(1, 64, 1)
+        self.conv1 = nn.Conv1d(1, 4, 1)
         # Convolutional layer from 64 channels back to 1
-        self.conv2 = nn.Conv1d(64, 1, 1)
+        self.conv2 = nn.Conv1d(4, 1, 1)
 
     def forward(self, x):
         # Pass the input through the LSTMModel
@@ -105,8 +105,8 @@ class Discriminator(nn.Module):
 
 
 # Create the Generator and Discriminator
-generator = Generator(input_size=1, hidden_size=16, num_layers=2)
-discriminator = Discriminator(input_size=1, hidden_size=16, num_layers=2)
+generator = Generator(input_size=1, hidden_size=4, num_layers=1)
+discriminator = Discriminator(input_size=1, hidden_size=4, num_layers=1)
 
 # # Wrap the models with DistributedDataParallel
 # generator = DistributedDataParallel(generator)
@@ -158,7 +158,7 @@ for epoch in tqdm(range(500)):
         schedulerG.step()
 
     # Write the progress to the CSV file
-    if epoch % 10 == 0:
+    if epoch % 1 == 0:
         with open('losses.csv', 'a', newline='') as file:
             writer = csv.writer(file)
             writer.writerow([epoch, loss_discriminator.item(), loss_generator.item()])
