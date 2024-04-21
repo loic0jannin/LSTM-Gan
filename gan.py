@@ -173,16 +173,17 @@ for epoch in tqdm(range(500)):
         output_generator = generator(noise_data_set)
         output_discriminator_generated = discriminator(output_generator)
         loss_generator = criterion(output_discriminator_generated, real_data_label)
+        
+        # Add diversity term to the loss
+        diversity_term = 1 / torch.std(output_generator)
+        loss_generator += diversity_term
+
         loss_generator.backward()
         optimizer_generator.step()
         schedulerG.step()
 
     # Write the progress to the CSV file
     if epoch % 1 == 0:
-        # with open('losses.csv', 'a', newline='') as file:
-            # writer = csv.writer(file)
-             #writer.writerow([epoch, loss_discriminator.item(), loss_generator.item()])
-
         # generate a random time series
         noise = torch.randn((1, N))
         generated_sample = generator(noise)
@@ -192,7 +193,6 @@ for epoch in tqdm(range(500)):
         print(generated_sample)
 
         print(f"Epoch {epoch}, Discriminator Loss: {loss_discriminator.item()}, Generator Loss: {loss_generator.item()}",flush=True)
-
 
 def get_random_sample_from_generator(generator, N, batch_size,num_samples):
     samples = []
