@@ -67,6 +67,7 @@ class Generator(nn.Module):
 
     def forward(self, x):
         # Pass the input through the LSTMModel
+        x = x.float()
         output = self.lstm(x)
         # Add an extra dimension for the number of channels
         output = output.unsqueeze(1)  # Now the shape is (batch_size, 1, seq_len)
@@ -92,6 +93,7 @@ class Discriminator(nn.Module):
     def forward(self, x):
         # Add noise to the input
         x = x + torch.randn_like(x) * 0.1
+        x = x.float()
         output = self.lstm(x)
         output = output.unsqueeze(1)
         first_conv = self.conv1(output)
@@ -105,9 +107,6 @@ class Discriminator(nn.Module):
 # Create the Generator and Discriminator
 generator = Generator(input_size=1, hidden_size=16, num_layers=2)
 discriminator = Discriminator(input_size=1, hidden_size=16, num_layers=2)
-
-# Use spectral normalization in the discriminator
-discriminator = spectral_norm(discriminator)
 
 # # Wrap the models with DistributedDataParallel
 # generator = DistributedDataParallel(generator)
@@ -146,8 +145,16 @@ for epoch in tqdm(range(500)):
         loss_discriminator = -torch.mean(output_real) + torch.mean(output_fake)
         loss_discriminator.backward()
         optimizer_discriminator.step()
-        
         schedulerD.step()
+
+        # Train the generator
+        generator.zero_grad()
+        noise_data_set = torch.randn((batch_size, N))
+        fake_data_set = generator(noise_data_set)
+        output_fake = discriminator(fake_data_set)
+        loss_generator = -torch.mean(output_fake)
+        loss_generator.backward()
+        optimizer_generator.step()
         schedulerG.step()
 
     # Write the progress to the CSV file
