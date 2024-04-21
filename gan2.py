@@ -40,7 +40,7 @@ class Generator(nn.Module):
         )
 
     def forward(self, x):
-         output = self.model(x)
+         output = self.model(x.float())
          return output
 
 # Define the Discriminator
@@ -59,7 +59,8 @@ class Discriminator(nn.Module):
         )
 
     def forward(self, x):
-         output = self.model(x)
+        
+         output = self.model(x.float())
          return output
 
 
