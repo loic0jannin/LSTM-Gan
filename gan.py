@@ -77,6 +77,8 @@ class Generator(nn.Module):
         output = second_conv.squeeze(1)  
         return output
 
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
 from torch.nn.utils import spectral_norm
@@ -104,9 +106,14 @@ class Discriminator(nn.Module):
         return output
 
 
+
 # Create the Generator and Discriminator
 generator = Generator(input_size=1, hidden_size=4, num_layers=1)
 discriminator = Discriminator(input_size=1, hidden_size=4, num_layers=1)
+
+print(f"Number of parameters in generator: {count_parameters(generator)}")
+print(f"Number of parameters in discriminator: {count_parameters(discriminator)}")
+
 
 # # Wrap the models with DistributedDataParallel
 # generator = DistributedDataParallel(generator)
