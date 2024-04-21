@@ -78,13 +78,15 @@ class Generator(nn.Module):
 
 
 
+from torch.nn.utils import spectral_norm
+
 class Discriminator(nn.Module):
     def __init__(self, input_size, hidden_size, num_layers, dropout_rate=0.2):
         super(Discriminator, self).__init__()
         self.lstm = LSTMModel(input_size, hidden_size, num_layers, dropout_rate)
-        self.conv1 = nn.Conv1d(1, 3, 1)
-        self.conv2 = nn.Conv1d(3, 1, 1)
-        self.fc = nn.Linear(100, 1)
+        self.conv1 = spectral_norm(nn.Conv1d(1, 3, 1))
+        self.conv2 = spectral_norm(nn.Conv1d(3, 1, 1))
+        self.fc = spectral_norm(nn.Linear(100, 1))
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
@@ -135,7 +137,7 @@ print("Training the GAN...")
 for epoch in tqdm(range(500)):
     for index, (real_data,) in enumerate(train_loader):
 
-            # Train the discriminator
+        # Train the discriminator
         discriminator.zero_grad()
         output_real = discriminator(real_data)
         noise_data_set = torch.randn((batch_size, N))
