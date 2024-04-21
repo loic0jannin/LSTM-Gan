@@ -124,8 +124,8 @@ print(f"Number of parameters in discriminator: {count_parameters(discriminator)}
 criterion = nn.BCELoss()
 
 # Define the optimizers
-optimizer_discriminator = torch.optim.Adam(discriminator.parameters(), lr=0.001)
-optimizer_generator = torch.optim.Adam(generator.parameters(), lr=0.001)
+optimizer_discriminator = torch.optim.Adam(discriminator.parameters(), lr=0.0001)
+optimizer_generator = torch.optim.Adam(generator.parameters(), lr=0.0001)
 
 # Use a learning rate scheduler
 schedulerD = torch.optim.lr_scheduler.StepLR(optimizer_discriminator, step_size=30, gamma=0.5)
